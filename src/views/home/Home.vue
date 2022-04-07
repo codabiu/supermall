@@ -4,7 +4,7 @@
     <tab-control class="tab-control" 
       :titles="['流行','新款','精选']" 
       @tabClick = "tabClick" 
-      ref="TabControl" v-show="isTabFixed"/>
+      ref="TabControl1" v-show="isTabFixed"/>
     <scroll class="content" 
     ref="scroll" 
     :probe-type = "3" 
@@ -17,7 +17,7 @@
       <tab-control 
       :titles="['流行','新款','精选']" 
       @tabClick = "tabClick" 
-      ref="TabControl"/>
+      ref="TabControl2"/>
       <goods-list :goods ="showGoods"/>
     </scroll>
     <back-top @click.native="backClick" v-show="isShowBackTop" /><!-- 监听原生组件加.native -->
@@ -99,6 +99,8 @@ export default {
             this.currentType = 'sell'
             break
         }
+        this.$refs.TabControl1.currentIndex = index;
+        this.$refs.TabControl2.currentIndex = index;
       },
       backClick(){
         this.$refs.scroll.scrollTo(0, 0, 500)//三个参数（x，y，毫秒）
@@ -117,7 +119,7 @@ export default {
       },
       swiperimageLoad(){
         // console.log(this.$refs.TabControl.$el.offsetTop);
-        this.tabOffsetTop = this.$refs.TabControl.$el.offsetTop
+        this.tabOffsetTop = this.$refs.TabControl2.$el.offsetTop
       },
 
       // 网络请求相关方法
