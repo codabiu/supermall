@@ -20,7 +20,7 @@ export default {
         bottom: 60px;
     }
     .back-top img {
-        width: 70px;
-        height: 70px;
+        width: 50px;
+        height: 50px;
     }
 </style>
