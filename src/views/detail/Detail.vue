@@ -2,6 +2,9 @@
     <div id="detail">
         <detail-nav-bar class="detail-nav" @titleclick="titleclick" ref="nav"/>
         <scroll class="content" ref="scroll" :probe-type = "3" @scroll="contentScroll">
+            <!-- <ul>
+                <li v-for="item in $store.state.cartList" :key="item.index">{{item}}</li>
+            </ul> -->
             <detail-swiper :top-images = "topImages"/>
             <detail-base-info :goods = "goods"/>
             <detail-shop-info :shop = "shop"/>
@@ -10,8 +13,11 @@
             <detail-comment-info :comment-info="commentInfo" ref="comment"/>
             <goods-list :goods = "recommends" ref="recommend"/>
         </scroll>
-        <detail-bottom-bar/>
+        <detail-bottom-bar @addToCart="addToCart"/>
+
         <back-top @click.native="backClick" v-show="isShowBackTop" />
+
+        <toast :message="message" :show="show"/>
     </div>
 </template>
 
@@ -31,6 +37,10 @@ import BackTop from 'components/content/backTop/BackTop'
 
 import {getDetail,Goods,Shop,GoodsParam,getRecommend} from 'network/detail'
 
+import { mapActions } from 'vuex'
+
+import Toast from '../../components/common/toast/Toast'
+
 export default {
     name:'Detail',
     components:{
@@ -44,7 +54,8 @@ export default {
         DetailBottomBar,
         GoodsList,
         BackTop,
-        Scroll 
+        Scroll,
+        Toast
     },    
     data(){
         return {
@@ -59,6 +70,8 @@ export default {
             themeTopYs:[],
             currentIndex:0,
             isShowBackTop:false,
+            message:'',
+            show:false
         }
     },
     created(){
@@ -104,12 +117,14 @@ export default {
                 this.themeTopYs.push(this.$refs.params.$el.offsetTop-44)
                 this.themeTopYs.push(this.$refs.comment.$el.offsetTop-44)
                 this.themeTopYs.push(this.$refs.recommend.$el.offsetTop-44)
-                console.log(this.themeTopYs);
+                // console.log(this.themeTopYs);
             })
 
         })
     },
     methods:{
+        ...mapActions(['addCart']),
+
         contentScroll(position){
             // 获取Y值
             const positionY = -position.y
@@ -130,10 +145,40 @@ export default {
         },
         backClick(){
         this.$refs.scroll.scrollTo(0, 0, 500)//三个参数（x，y，毫秒）
-      },
+        },
         titleclick(index){
             // console.log(index);
             this.$refs.scroll.scrollTo(0,-this.themeTopYs[index],1000)
+        },
+
+        // 加入购物车
+        addToCart(){
+            // 1.获取购物车需要展示的信息
+            const product = {}
+            product.image = this.topImages[0]
+            product.title = this.goods.title
+            product.desc = this.goods.desc
+            product.price = this.goods.realPrice
+            product.iid = this.iid
+
+            // 2.将商品添加到购物车
+
+            // 通过mapActions将addCart方法映射到该组件
+            // this.addCart(product).then(res => {
+            //     console.log(res);
+            // })
+
+            // this.$store.commit('addCart',product)
+            this.$store.dispatch('addCart',product).then(res => {
+                // console.log(res);
+                this.show = true
+                this.message = res
+
+                setTimeout(() => {
+                    this.show = false
+                    this.message = ''
+                },1500)
+            })
         }
     }  
 }
